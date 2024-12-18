@@ -50,11 +50,35 @@ import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.PlainTextByLineStream;
 */
 public class TDemo {
-	private static String paragraph = "Let's pause, \nand then reflect. ";
+	private static String paragraph = "Let's pause, \nand then reflect.";
 	public static void main(String[] args) {
 		//токенизация объекта класса Scanner 
 		System.out.println("Использование класса Scanner  для токенизации ");
 		usingTheScannerClass();
+		
+		//Токенизация при помощи метода Split
+		System.out.println("\n\nИспользование метода Split для токенизации ");
+		String text = "Mr.Smith went to 14 Washington avenue. ";
+		String[] tokens = text.split("\\s+");
+		for (String token : tokens){
+			System.out.println(token);
+		}
+		//split() с другим текстом:
+		System.out.println("\n");
+		text = paragraph;
+		String[] tokens2 = text.split("\\s+");
+                for (String token : tokens2){
+                        System.out.println(token);
+                }
+		//Токенизация при помощи класса BreakIterator
+		 System.out.println("\n\nТокенизация при помощи класса BreakIterator ");
+		 usingTheBreakIterator();
+
+		 //Тщкенизация при помощи класса 
+		 System.out.println("\n\nТокенизация при помощи класса StreamTokenixerClass ");
+                 usingStreamTokenizerClass();
+
+
 	}
 	private static void usingTheScannerClass() {
 		Scanner scanner = new Scanner(paragraph);
@@ -68,6 +92,50 @@ public class TDemo {
 		}
 		for (String token : list) {
 			System.out.println(token);
+		}
+	}
+	private static void usingTheBreakIterator() {
+		BreakIterator wordIterator = BreakIterator.getWordInstance();
+		String text2 = paragraph;
+		wordIterator.setText(text2);
+		int boundary = wordIterator.first();
+		while (boundary != BreakIterator.DONE){
+			int begin = boundary;
+			System.out.print(boundary + "-");
+			boundary = wordIterator.next();
+			int end = boundary;
+			if (end == BreakIterator.DONE) break;
+			System.out.println(boundary + " [" + text2.substring(begin, end)+"]");
+		}
+		System.out.println();
+	}
+
+	private static void usingStreamTokenizerClass() {
+		try {
+			StreamTokenizer tokenizer = new StreamTokenizer(new StringReader (paragraph));
+			tokenizer.ordinaryChar('\'');
+			tokenizer.ordinaryChar(',');
+			boolean isEOF = false;
+			while(!isEOF) {
+				int token = tokenizer.nextToken();
+				switch (token) {
+					case StreamTokenizer.TT_EOF:
+						isEOF = true;
+						break;
+					case StreamTokenizer.TT_EOL:
+						break; 
+					case StreamTokenizer.TT_WORD:
+						System.out.println(tokenizer.sval);
+						break;
+					case StreamTokenizer.TT_NUMBER:
+                                                System.out.println(tokenizer.nval);
+						break;
+					default:
+						System.out.println((char) token);
+				}
+			}
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 } 
